@@ -10,7 +10,11 @@
 #define LCD_H_
 #include "Keypad.h"
 
-
+/************************
+ * A5 - Select
+ * A6 - Enter
+ * A7 - Reset 
+ ************************/
 
 unsigned char welcomeMessage[67] = "Let's play Hangman! Player 1, enter a word for Player 2 to guess.";
 unsigned char front;
@@ -18,6 +22,9 @@ unsigned char LCDindex = 0;
 unsigned char customChar[8] = {0x0E, 0x0A, 0x0E, 0x04, 0x0E, 0x04, 0x04, 0x0A};
 unsigned char cursor = 0;
 unsigned char clear = 1;
+unsigned char wordToGuess[17] = {' '};
+unsigned char WTG_Index = 0;
+unsigned char lastClicked;
 
 void LCDBuildChar(unsigned char loc, unsigned char *p)
 {
@@ -28,12 +35,13 @@ void LCDBuildChar(unsigned char loc, unsigned char *p)
 		for(i=0;i<8;i++)
 		LCD_WriteData(p[i]); //Write the character pattern to CGRAM
 	}
-	//LCD_WriteCommand(0x80); //shift back to DDRAM location 0
 }
 
 
 enum LCD_States{Init, Wait, WelcomeLCD, P1InputLCD, P2InputLCD, WinLCD, LoseLCD};
 unsigned char count = 0; //counts how long display message is being displayed
+
+
 int LCD_Tick(int state){
 	switch (state)
 	{
@@ -47,13 +55,14 @@ int LCD_Tick(int state){
 		break;
 		case WelcomeLCD : if(count <= 51){ state = WelcomeLCD;}
 						  else if(count > 51){state = P1InputLCD;
-						  LCD_ClearScreen(); }
+						  LCD_ClearScreen(); 
+						  LCDindex = 1;}
 		break;
 		case P1InputLCD : state = P1InputLCD;
-// 		if(character == 'e'){state = P2InputLCD;
-// 								LCD_ClearScreen();}
-// 						  else{
-// 							  state = P1InputLCD;}
+						if(GetBit(~PINA, 6)){state = P2InputLCD;}
+								//LCD_ClearScreen();}
+								else{
+							  state = P1InputLCD;}
 		break;
 		case P2InputLCD :
 		break;
@@ -114,19 +123,35 @@ int LCD_Tick(int state){
 		
 			
 		break;
-		case P1InputLCD :	if(!(character == 0x1F)){
-			LCD_Cursor(1);
-			if(character == 'A' || character == 'B' ||
-			character == 'C' || character == 'D' ||
-			character == 'x' || character == '#' ){
-				LCD_WriteData(character);
-				}else{
-				LCD_WriteData(character + '0');
+		case P1InputLCD :
+			
+			if(GetBit(~PINA,5)){
+				if(WTG_Index < 16){
+					LCDindex++;
+					wordToGuess[WTG_Index] = lastClicked;
+					WTG_Index++;
+					character = ' ';
+				}
+				
 			}
+			LCD_Cursor(LCDindex);
+			if(character != ' '){
+				lastClicked = character;
+				LCD_WriteData(character);
+			}
+			
+				
 
-		}
+		
 		break;
-		case P2InputLCD :
+		case P2InputLCD : LCD_ClearScreen();
+		for(unsigned char l = 0; l < WTG_Index; l++){
+			LCD_Cursor(l + 1);
+			LCD_WriteData(wordToGuess[l]);
+		}
+		LCD_Cursor(17);
+		LCD_WriteData('*');
+							
 		break;
 		case WinLCD:
 		break;

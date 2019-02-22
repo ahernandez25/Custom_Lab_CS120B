@@ -27,7 +27,7 @@ int main(void)
 		DDRC = 0xF0; PORTC = 0x0F; // PC7..4 outputs init 0s, PC3..0 inputs init 1s
 	
 	unsigned long LCDPeriod = 500;
-	unsigned long KPPeriod = 500;
+	unsigned long KPPeriod = 300;
 	unsigned long period = 100;
 	unsigned char i = 0;
 	

@@ -18,7 +18,7 @@ unsigned char GetBit( unsigned char x, unsigned char k) {
 
 
 
-unsigned char character = 0x1F;
+unsigned char character = ' ';
 unsigned char index = 1;
 unsigned char click = 0;
 
@@ -83,33 +83,85 @@ int KeypadTick(int state){
 		case KP_Display :
 		
 		switch (x) {
-			case '\0': character = 0x1F; break ; // All 5 LEDs on
-			case '1': character = 0x01F; break ; // hex equivalent
-			case '2': character = 0x02;
-			/*if(click % 3 == 1){
-						character = 'A';
-					  }else if(click % 3 == 2){
-						  character = 'B';
-					  }else if(click % 3 == 0){
-						  character = 'C';
-					  } 
-				break ; */
+			case '\0': character = ' '; break ; // All 5 LEDs on
+			case '1': character = ' '; break ; // hex equivalent
+			case '2': 
+						if(click % 3 == 1){
+							character = 'A';
+						}else if(click % 3 == 2){
+							character = 'B';
+						}else if(click % 3 == 0){
+							character = 'C';
+						} 
 			break;
-			case '3': character = 0x03; break ;
-			case '4': character = 0x04; break ;
-			case '5': character = 0x05; break ;
-			case '6': character = 0x06; break ;
-			case '7': character = 0x07; break ;
-			case '8': character = 0x08; break ;
-			case '9': character = 0x09; break ;
+			case '3':	if(click % 3 == 1){
+							character = 'D';
+						}else if(click % 3 == 2){
+							character = 'E';
+						}else if(click % 3 == 0){
+							character = 'F';
+						}
+			break ;
+			case '4':	if(click % 3 == 1){
+							character = 'G';
+						}else if(click % 3 == 2){
+							character = 'H';
+						}else if(click % 3 == 0){
+							character = 'I';
+						}
+			break ;
+			case '5': if(click % 3 == 1){
+						character = 'J';
+					  }else if(click % 3 == 2){
+						character = 'K';
+					  }else if(click % 3 == 0){
+						character = 'L';
+					  }
+			break ;
+			case '6': if(click % 3 == 1){
+						character = 'M';
+					}else if(click % 3 == 2){
+						character = 'N';
+					}else if(click % 3 == 0){
+						character = '0';
+					}
+			break ;
+			case '7':	if(click % 4 == 1){
+							character = 'P';
+						} else if(click % 4 == 2){
+							character = 'Q';
+						} else if(click % 4 == 3){
+							character = 'R';
+						} else if(click % 4 == 0){
+							character = 'S';
+						}
+			break ;
+			case '8': if(click % 3 == 1){
+						character = 'T';
+					} else if(click % 3 == 2){
+						character = 'U';
+					} else if(click % 3 == 3){
+						character = 'V';
+					}
+			break ;
+			case '9': if(click % 4 == 1){
+						character = 'W';
+					} else if(click % 4 == 2){
+						character = 'X';
+					} else if(click % 4 == 3){
+						character = 'Y';
+					} else if(click % 4 == 0){
+						character = 'Z';
+					}
+			break ;
 			case 'A': character = 's'; break ;
 			case 'B': character = 'e'; break ;
-			case 'C': character = 'C'; break ;
-			case 'D': character = 'D'; break ;
-			case '*': character = '*'; break ;
-			case '0': character = 0; break ;
-			case '#': character = '#'; break ;
-			default : character = 0x1B; break ; // Should never occur. Middle LED
+			case 'C': break ;
+			case 'D': break ;
+			case '*': break ;
+			case '0': break ;
+			case '#': break ;
+			default : break ; // Should never occur. Middle LED
 		}
 		break;
 		default: State = GetKey;
