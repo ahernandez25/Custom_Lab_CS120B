@@ -48,6 +48,11 @@ int LCD_Tick(int state){
 	{
 		case Init : state = WelcomeLCD;
 					LCD_ClearScreen();
+					SPI_Init();
+					N5110_init();
+					N5110_clear();
+					lcd_setXY(0x40,0x80);
+					N5110_Data("Hangman!");
 					
 					
 					
@@ -92,12 +97,7 @@ int LCD_Tick(int state){
 								// put the saved character on the end
 								welcomeMessage[67] = front; */
 		
-				SPI_Init();
-				N5110_init();
-				N5110_clear();
-				lcd_setXY(0x40,0x80);
-				N5110_Data("ElectronicWings");
-		
+						
 			for(LCDindex = 0; LCDindex < 16; LCDindex++){
 				LCD_Cursor(LCDindex + 1);
 				LCD_WriteData(welcomeMessage[LCDindex]);

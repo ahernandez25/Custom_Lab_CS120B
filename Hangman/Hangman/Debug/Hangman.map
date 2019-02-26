@@ -427,7 +427,7 @@ END GROUP
  *(.fini0)
                 0x000009e6                _etext = .
 
-.data           0x00800100      0x260 load address 0x000009e6
+.data           0x00800100      0x25a load address 0x000009e6
                 0x00800100                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -450,48 +450,49 @@ END GROUP
  *(.rodata)
  *(.rodata*)
  .rodata.str1.1
-                0x00800161       0x1f main.o
- .rodata.ASCII  0x00800180      0x1e0 main.o
+                0x00800161       0x18 main.o
+ .rodata.ASCII  0x00800179      0x1e0 main.o
  *(.gnu.linkonce.r*)
-                0x00800360                . = ALIGN (0x2)
-                0x00800360                _edata = .
-                0x00800360                PROVIDE (__data_end, .)
+                0x0080035a                . = ALIGN (0x2)
+ *fill*         0x00800359        0x1 
+                0x0080035a                _edata = .
+                0x0080035a                PROVIDE (__data_end, .)
 
-.bss            0x00800360       0x23
-                0x00800360                PROVIDE (__bss_start, .)
+.bss            0x0080035a       0x23
+                0x0080035a                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
- .bss.Tasks     0x00800360       0x16 main.o
- .bss.count     0x00800376        0x1 main.o
-                0x00800376                count
+ .bss.Tasks     0x0080035a       0x16 main.o
+ .bss.count     0x00800370        0x1 main.o
+                0x00800370                count
  .bss.WTG_Index
-                0x00800377        0x1 main.o
-                0x00800377                WTG_Index
- .bss.LCDindex  0x00800378        0x1 main.o
-                0x00800378                LCDindex
- .bss.click     0x00800379        0x1 main.o
-                0x00800379                click
+                0x00800371        0x1 main.o
+                0x00800371                WTG_Index
+ .bss.LCDindex  0x00800372        0x1 main.o
+                0x00800372                LCDindex
+ .bss.click     0x00800373        0x1 main.o
+                0x00800373                click
  .bss._avr_timer_cntcurr
-                0x0080037a        0x4 main.o
-                0x0080037a                _avr_timer_cntcurr
+                0x00800374        0x4 main.o
+                0x00800374                _avr_timer_cntcurr
  .bss.TimerFlag
-                0x0080037e        0x1 main.o
-                0x0080037e                TimerFlag
+                0x00800378        0x1 main.o
+                0x00800378                TimerFlag
  *(COMMON)
- COMMON         0x0080037f        0x4 main.o
-                0x0080037f                x
-                0x00800380                front
-                0x00800381                State
-                0x00800382                lastClicked
-                0x00800383                PROVIDE (__bss_end, .)
+ COMMON         0x00800379        0x4 main.o
+                0x00800379                x
+                0x0080037a                front
+                0x0080037b                State
+                0x0080037c                lastClicked
+                0x0080037d                PROVIDE (__bss_end, .)
                 0x000009e6                __data_load_start = LOADADDR (.data)
-                0x00000c46                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00000c40                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x00800383        0x0
+.noinit         0x0080037d        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
  *(.noinit*)
                 [!provide]                PROVIDE (__noinit_end, .)
-                0x00800383                _end = .
+                0x0080037d                _end = .
                 [!provide]                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
