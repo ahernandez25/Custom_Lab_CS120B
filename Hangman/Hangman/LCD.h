@@ -9,6 +9,7 @@
 #ifndef LCD_H_
 #define LCD_H_
 #include "Keypad.h"
+#include "NokiaLCD.h"
 
 /************************
  * A5 - Select
@@ -59,12 +60,16 @@ int LCD_Tick(int state){
 						  LCDindex = 1;}
 		break;
 		case P1InputLCD : state = P1InputLCD;
-						if(GetBit(~PINA, 6)){state = P2InputLCD;}
-								//LCD_ClearScreen();}
-								else{
-							  state = P1InputLCD;}
+						if(GetBit(~PINA, 6)){
+							state = P2InputLCD;
+							LCD_ClearScreen();
+							LCD_DisplayString(17,"16 Letters MAX");	
+							LCD_Cursor(1);
+						}else{						
+							state = P1InputLCD;
+						}
 		break;
-		case P2InputLCD :
+		case P2InputLCD : 
 		break;
 		case WinLCD:
 		break;
@@ -87,6 +92,11 @@ int LCD_Tick(int state){
 								// put the saved character on the end
 								welcomeMessage[67] = front; */
 		
+				SPI_Init();
+				N5110_init();
+				N5110_clear();
+				lcd_setXY(0x40,0x80);
+				N5110_Data("ElectronicWings");
 		
 			for(LCDindex = 0; LCDindex < 16; LCDindex++){
 				LCD_Cursor(LCDindex + 1);
@@ -131,6 +141,7 @@ int LCD_Tick(int state){
 					wordToGuess[WTG_Index] = lastClicked;
 					WTG_Index++;
 					character = ' ';
+					click = 0;
 				}
 				
 			}
@@ -144,13 +155,19 @@ int LCD_Tick(int state){
 
 		
 		break;
-		case P2InputLCD : LCD_ClearScreen();
-		for(unsigned char l = 0; l < WTG_Index; l++){
-			LCD_Cursor(l + 1);
-			LCD_WriteData(wordToGuess[l]);
-		}
-		LCD_Cursor(17);
-		LCD_WriteData('*');
+ 		case P2InputLCD : 
+// 		for(unsigned char l = 0; l < WTG_Index; l++){
+// 			LCD_Cursor(l + 1);
+// 			LCD_WriteData(wordToGuess[l]);
+// 		}
+// 		LCD_Cursor(17);
+// 		LCD_WriteData('*');
+// 		SPI_Init();
+// 		N5110_init();
+// 				N5110_clear();
+// 				lcd_setXY(0x40,0x80);
+// 				N5110_Data("ElectronicWings");
+				
 							
 		break;
 		case WinLCD:

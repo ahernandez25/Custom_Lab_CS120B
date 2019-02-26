@@ -8,6 +8,7 @@
 #include <avr/io.h>
 #include "LCD.h"
 
+
 typedef struct task {
 	/*Tasks should have members that include: state, period,
 	a measurement of elapsed time, and a function pointer.*/

@@ -154,8 +154,8 @@ int KeypadTick(int state){
 						character = 'Z';
 					}
 			break ;
-			case 'A': character = 's'; break ;
-			case 'B': character = 'e'; break ;
+			case 'A':  break ;
+			case 'B': break ;
 			case 'C': break ;
 			case 'D': break ;
 			case '*': break ;
