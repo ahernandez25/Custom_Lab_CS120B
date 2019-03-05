@@ -10,6 +10,8 @@
 #define LCD_H_
 #include "Keypad.h"
 #include "NokiaLCD.h"
+#include "LCDImages.h"
+#include "WordOperations.h"
 
 /************************
  * A5 - Select
@@ -23,7 +25,7 @@ unsigned char LCDindex = 0;
 unsigned char customChar[8] = {0x0E, 0x0A, 0x0E, 0x04, 0x0E, 0x04, 0x04, 0x0A};
 unsigned char cursor = 0;
 unsigned char clear = 1;
-unsigned char wordToGuess[17] = {' '};
+
 unsigned char WTG_Index = 0;
 unsigned char lastClicked;
 
@@ -51,25 +53,35 @@ int LCD_Tick(int state){
 					SPI_Init();
 					N5110_init();
 					N5110_clear();
-					lcd_setXY(0x40,0x80);
-					N5110_Data("Hangman!");
 					
+					//used to set image on nokia screen
+// 					lcd_setXY(0x40,0x80);
+// 					N5110_image(&head_body_arm_leg2);
 					
 					
 		break;
 		case Wait : 
 		break;
-		case WelcomeLCD : if(count <= 51){ state = WelcomeLCD;}
-						  else if(count > 51){state = P1InputLCD;
-						  LCD_ClearScreen(); 
-						  LCDindex = 1;}
+		case WelcomeLCD : if(count <= 51){ 
+							  state = WelcomeLCD;
+						  }
+						  else if(count > 51){
+							  state = P1InputLCD;
+							  LCD_ClearScreen();
+							  LCD_DisplayString(17,"16 Letters MAX");
+							  LCD_Cursor(1);
+							  LCDindex = 1;
+						 }
 		break;
 		case P1InputLCD : state = P1InputLCD;
 						if(GetBit(~PINA, 6)){
 							state = P2InputLCD;
 							LCD_ClearScreen();
-							LCD_DisplayString(17,"16 Letters MAX");	
 							LCD_Cursor(1);
+							LCDindex = 1;
+							
+							LCD_WriteData(wordLength + '0');
+							
 						}else{						
 							state = P1InputLCD;
 						}
@@ -142,6 +154,7 @@ int LCD_Tick(int state){
 					WTG_Index++;
 					character = ' ';
 					click = 0;
+					wordLength++;
 				}
 				
 			}

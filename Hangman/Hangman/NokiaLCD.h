@@ -91,7 +91,30 @@ void N5110_image(const unsigned char *image_data)		/* clear the Display */
 	SPI_SS_Disable();
 }
 
-
+void N5110_Custom_Data(const unsigned char *data)
+{
+	PORTB |= (1<<DC);									/* make DC pin to logic high for data operation */
+	SPI_SS_Enable();		
+								/* enable SS pin to slave selection */
+	unsigned char yPos = 0x40;
+	unsigned char xPos = 0x80;
+	//lcd_setXY(yPos, 0x80);
+	for (int g = 0; g < 504; g++)
+	{
+// 		if(((g % 3) == 0) && (g != 0) ){
+// 			yPos = yPos + 8;
+// 			xPos = xPos + 5;
+// 			lcd_setXY(yPos, xPos);
+// 		}
+		
+		//for (int index = 0; index < 5; index++)
+		//{
+			SPI_Write(data[g]);	/* send the data on data register */
+		//}
+		SPI_Write(0x00);
+	}
+	SPI_SS_Disable();
+}
 
 
 #endif /* NOKIALCD_H_ */
