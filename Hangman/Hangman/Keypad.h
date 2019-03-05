@@ -123,7 +123,7 @@ int KeypadTick(int state){
 					}else if(click % 3 == 2){
 						character = 'N';
 					}else if(click % 3 == 0){
-						character = '0';
+						character = 'O';
 					}
 			break ;
 			case '7':	if(click % 4 == 1){

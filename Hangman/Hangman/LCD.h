@@ -22,12 +22,15 @@
 unsigned char welcomeMessage[67] = "Let's play Hangman! Player 1, enter a word for Player 2 to guess.";
 unsigned char front;
 unsigned char LCDindex = 0;
-unsigned char customChar[8] = {0x0E, 0x0A, 0x0E, 0x04, 0x0E, 0x04, 0x04, 0x0A};
-unsigned char cursor = 0;
-unsigned char clear = 1;
+unsigned char customChar[8] = {0x0E, 0x0A, 0x0E, 0x04, 0x0E, 0x04, 0x04, 0x0A}; //hangman charactr
 
-unsigned char WTG_Index = 0;
-unsigned char lastClicked;
+
+unsigned char displayGuess[17] = {' '}; //shows player 2 correct guesses
+unsigned char P2Guess; //holds letter player 2 guessed
+
+unsigned char WTG_Index = 0; //world to guess index
+unsigned char lastClicked;  //last letter user clicked
+unsigned char letterFound = 0; //checks is the letter P2 guess was in P1s word
 
 void LCDBuildChar(unsigned char loc, unsigned char *p)
 {
@@ -37,6 +40,14 @@ void LCDBuildChar(unsigned char loc, unsigned char *p)
 		LCD_WriteCommand(0x40+(loc*8)); //Write to CGRAM
 		for(i=0;i<8;i++)
 		LCD_WriteData(p[i]); //Write the character pattern to CGRAM
+	}
+}
+
+unsigned char CheckGuessed(){
+	for(unsigned char b = 0; b < 17; b++){
+		if(wordToGuess[b] == P2Guess){
+			displayGuess[b] = wordToGuess[b];
+		}
 	}
 }
 
@@ -73,20 +84,31 @@ int LCD_Tick(int state){
 							  LCDindex = 1;
 						 }
 		break;
-		case P1InputLCD : state = P1InputLCD;
-						if(GetBit(~PINA, 6)){
-							state = P2InputLCD;
-							LCD_ClearScreen();
+		case P1InputLCD :	if(GetBit(~PINA, 6)){
+								LCD_ClearScreen();
+								state = P2InputLCD;
+								delay_ms(2);
+							
+							
+							for(unsigned char a = 0; a < WTG_Index; a++){
+								displayGuess[a] = '_';
+								LCD_Cursor(a + 17);
+								LCD_WriteData('_');
+							}
+								
 							LCD_Cursor(1);
-							LCDindex = 1;
-							
-							LCD_WriteData(wordLength + '0');
-							
+							LCDindex = 1;					
 						}else{						
 							state = P1InputLCD;
 						}
 		break;
-		case P2InputLCD : 
+		case P2InputLCD :	if(GetBit(~PINA, 6)){
+								
+							}
+							else
+							{
+								state = P2InputLCD;
+							}
 		break;
 		case WinLCD:
 		break;
@@ -154,7 +176,7 @@ int LCD_Tick(int state){
 					WTG_Index++;
 					character = ' ';
 					click = 0;
-					wordLength++;
+					
 				}
 				
 			}
@@ -180,6 +202,18 @@ int LCD_Tick(int state){
 // 				N5110_clear();
 // 				lcd_setXY(0x40,0x80);
 // 				N5110_Data("ElectronicWings");
+
+				if(GetBit(~PINA,5)){
+						P2Guess = lastClicked;
+						character = ' ';
+						click = 0;
+					
+				}
+				LCD_Cursor(1);
+				if(character != ' '){
+					lastClicked = character;
+					LCD_WriteData(character);
+				}
 				
 							
 		break;
