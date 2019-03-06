@@ -18,17 +18,19 @@ typedef struct task {
 	int (*TickFct)( int ); //Task tick function
 } task;
 
-	static task Tasks[2];
+	static task Tasks[3];
 
 int main(void)
 {
 	DDRD = 0xFF; PORTD = 0x00; // LCD data lines
 	DDRA = 0xFF; PORTA = 0xFF; // LCD control lines
-		DDRB = 0xFF; PORTB = 0x00; // PORTB set to output, outputs init 0s
-		DDRC = 0xF0; PORTC = 0x0F; // PC7..4 outputs init 0s, PC3..0 inputs init 1s
+	DDRB = 0xFF; PORTB = 0x00; // PORTB set to output, outputs init 0s
+	DDRC = 0xF0; PORTC = 0x0F; // PC7..4 outputs init 0s, PC3..0 inputs init 1s
 	
 	unsigned long LCDPeriod = 500;
 	unsigned long KPPeriod = 300;
+	unsigned long WAPeriod = 100;
+	
 	unsigned long period = 100;
 	unsigned char i = 0;
 	
@@ -41,17 +43,24 @@ int main(void)
 	Tasks[i].period = KPPeriod;
 	Tasks[i].elapsedTime = KPPeriod;
 	Tasks[i].TickFct = &KeypadTick;
+	i++;
+	Tasks[i].state = WA_Wait;
+	Tasks[i].period = WAPeriod;
+	Tasks[i].elapsedTime = WAPeriod;
+	Tasks[i].TickFct = &WA_Tick;
 	
 	//LCDBuildChar(0, customChar);
 	TimerSet(period);
 	TimerOn();
 	LCD_init();
+	PWM_on();
+
 	
 	
 	//LCD_DisplayString(1,"Please Work");
 	
 	while (1) {
-		for ( i = 0; i < 2; i++ ) {
+		for ( i = 0; i < 3; i++ ) {
 			// Task is ready to tick
 			if ( Tasks[i].elapsedTime == Tasks[i].period ) {
 				// Setting next state for task

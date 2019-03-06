@@ -1,10 +1,3 @@
-/*
- * LCD.h
- *
- * Created: 2/19/2019 3:11:13 PM
- *  Author: ashly
- */ 
-
 
 #ifndef LCD_H_
 #define LCD_H_
@@ -12,6 +5,8 @@
 #include "NokiaLCD.h"
 #include "LCDImages.h"
 #include "WordOperations.h"
+#include "WrongAnswer.h"
+
 
 /************************
  * A5 - Select
@@ -25,12 +20,12 @@ unsigned char LCDindex = 0;
 unsigned char customChar[8] = {0x0E, 0x0A, 0x0E, 0x04, 0x0E, 0x04, 0x04, 0x0A}; //hangman charactr
 
 
-unsigned char displayGuess[17] = {' '}; //shows player 2 correct guesses
+unsigned char displayGuess[17] = {'_'}; //shows player 2 correct guesses
 unsigned char P2Guess; //holds letter player 2 guessed
 
 unsigned char WTG_Index = 0; //world to guess index
 unsigned char lastClicked;  //last letter user clicked
-unsigned char letterFound = 0; //checks is the letter P2 guess was in P1s word
+
 
 void LCDBuildChar(unsigned char loc, unsigned char *p)
 {
@@ -43,10 +38,16 @@ void LCDBuildChar(unsigned char loc, unsigned char *p)
 	}
 }
 
-unsigned char CheckGuessed(){
+void CheckGuessed(){
+	letterFound = 0;
+	
 	for(unsigned char b = 0; b < 17; b++){
 		if(wordToGuess[b] == P2Guess){
 			displayGuess[b] = wordToGuess[b];
+		}
+		else
+		{
+			letterFound = 1;
 		}
 	}
 }
@@ -207,6 +208,16 @@ int LCD_Tick(int state){
 						P2Guess = lastClicked;
 						character = ' ';
 						click = 0;
+						LCD_Cursor(1);
+						LCD_WriteData(' ');
+						LCD_Cursor(1);
+						
+						CheckGuessed();
+						for(unsigned char a = 0; a < WTG_Index; a++){
+							LCD_Cursor(a + 17);
+							LCD_WriteData(displayGuess[a]);
+						}
+						
 					
 				}
 				LCD_Cursor(1);
