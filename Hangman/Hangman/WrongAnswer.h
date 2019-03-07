@@ -89,6 +89,8 @@ int WA_Tick(int state){
 		default:
 		break;
 	}
+	
+	return state;
 };
 
 

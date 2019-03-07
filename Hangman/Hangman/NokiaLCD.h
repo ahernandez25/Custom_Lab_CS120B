@@ -16,6 +16,7 @@
 #include <string.h>
 #include "SPI_Master_H_file.h"
 #include "Font.h"
+#include "LCDImages.h"
 
 
 void N5110_Cmnd(char DATA)
@@ -114,6 +115,103 @@ void N5110_Custom_Data(const unsigned char *data)
 		SPI_Write(0x00);
 	}
 	SPI_SS_Disable();
+}
+
+enum NokiaStates {Nokia_Init, Nokia_Wait, Strike1, Strike2, Strike3, Strike4, Strike5, Nokia_Lose, 
+	Nokia_Win};
+
+unsigned char strike = 0;
+	
+int Nokia_Tick(int state){
+	switch (state)
+	{
+		case Nokia_Init: 	SPI_Init();
+							N5110_init();
+							N5110_clear();
+							lcd_setXY(0x40,0x80);
+							N5110_image(&logo);
+							state = Nokia_Wait;
+		break;
+		case Nokia_Wait : if(strike == 1){
+							 state = Strike1;
+							 N5110_clear();
+							 lcd_setXY(0x40,0x80);
+							 N5110_image(&head);
+						  } else{
+							  state = Nokia_Wait;
+						  } 
+		break;
+		case Strike1 :	if(strike == 2){
+							state = Strike2;
+						} else{
+							state = Strike1;
+						}
+		break;
+		case Strike2 :  if(strike == 3){
+							state = Strike3;
+							N5110_clear();
+							lcd_setXY(0x40,0x80);
+							N5110_image(&head_body_arm1);
+						} else{
+							state = Strike2;
+						}
+		break;
+		case Strike3 :	if(strike == 4){
+							state = Strike4;
+							N5110_clear();
+							lcd_setXY(0x40,0x80);
+							N5110_image(&head_body_arm2);
+						} else{
+							state = Strike3;
+						}
+		break;
+		case Strike4 : if(strike == 5){
+							state = Strike5;
+							N5110_clear();
+							lcd_setXY(0x40,0x80);
+							N5110_image(&head_body_arm_leg1);
+						} else{
+							state = Strike4;
+						}	
+		break;
+		case Strike5 :  if(strike == 6){
+							state = Nokia_Lose;
+							N5110_clear();
+		 					lcd_setXY(0x40,0x80);
+		 					N5110_image(&head_body_arm_leg2);
+						} else{
+							state = Strike5;
+						}
+		break;
+		case Nokia_Lose :
+		break;
+		case Nokia_Win :
+		break;
+	}//end transitions
+	
+	switch (state)
+	{
+		case Nokia_Init :
+		break;
+		case Nokia_Wait : 
+		break;
+		case Strike1 :	N5110_clear();
+		break;
+		case Strike2 :  
+		break;
+		case Strike3 :	
+		break;
+		case Strike4 : 
+		break;
+		case Strike5 : 
+		break;
+		case Nokia_Lose :
+		break;
+		case Nokia_Win :
+		break;
+	}
+	
+	return state;
 }
 
 

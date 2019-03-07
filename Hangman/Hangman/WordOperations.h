@@ -7,6 +7,7 @@ unsigned char wordToGuess[17] = {' '};
 
 unsigned char wordLength = 0;
 
+
 int SizeOfWord(){
 	int length = 0;
 	unsigned char* length1;
@@ -27,6 +28,8 @@ int SizeOfWord(){
 	
 	return length;
 }
+
+
 
 
 

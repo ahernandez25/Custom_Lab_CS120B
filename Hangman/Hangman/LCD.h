@@ -3,7 +3,7 @@
 #define LCD_H_
 #include "Keypad.h"
 #include "NokiaLCD.h"
-#include "LCDImages.h"
+
 #include "WordOperations.h"
 #include "WrongAnswer.h"
 
@@ -26,6 +26,10 @@ unsigned char P2Guess; //holds letter player 2 guessed
 unsigned char WTG_Index = 0; //world to guess index
 unsigned char lastClicked;  //last letter user clicked
 
+unsigned char SetBit( unsigned char x, unsigned char k, unsigned char b) {
+	return (b ? x | (0x01 << k) : x & ~(0x01 << k));
+}
+
 
 void LCDBuildChar(unsigned char loc, unsigned char *p)
 {
@@ -39,16 +43,19 @@ void LCDBuildChar(unsigned char loc, unsigned char *p)
 }
 
 void CheckGuessed(){
-	letterFound = 0;
-	
-	for(unsigned char b = 0; b < 17; b++){
+	letterFound = 0; //letter exists in word
+	unsigned char b = 0;
+	while((b < WTG_Index) || !letterFound){
 		if(wordToGuess[b] == P2Guess){
 			displayGuess[b] = wordToGuess[b];
-		}
-		else
-		{
 			letterFound = 1;
 		}
+		b++;
+	}//end while
+	
+	if(letterFound == 0){
+		strike++;
+		PORTB = SetBit(PORTB,2,1);
 	}
 }
 
@@ -62,13 +69,9 @@ int LCD_Tick(int state){
 	{
 		case Init : state = WelcomeLCD;
 					LCD_ClearScreen();
-					SPI_Init();
-					N5110_init();
-					N5110_clear();
-					
-					//used to set image on nokia screen
-// 					lcd_setXY(0x40,0x80);
-// 					N5110_image(&head_body_arm_leg2);
+// 					//used to set image on nokia screen
+//  					lcd_setXY(0x40,0x80);
+//  					N5110_image(&head_body_arm_leg2);
 					
 					
 		break;
@@ -211,7 +214,7 @@ int LCD_Tick(int state){
 						LCD_Cursor(1);
 						LCD_WriteData(' ');
 						LCD_Cursor(1);
-						
+						SetBit(PORTB,2,1);
 						CheckGuessed();
 						for(unsigned char a = 0; a < WTG_Index; a++){
 							LCD_Cursor(a + 17);
