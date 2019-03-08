@@ -26,9 +26,6 @@ unsigned char P2Guess; //holds letter player 2 guessed
 unsigned char WTG_Index = 0; //world to guess index
 unsigned char lastClicked;  //last letter user clicked
 
-unsigned char SetBit( unsigned char x, unsigned char k, unsigned char b) {
-	return (b ? x | (0x01 << k) : x & ~(0x01 << k));
-}
 
 
 void LCDBuildChar(unsigned char loc, unsigned char *p)
@@ -43,9 +40,10 @@ void LCDBuildChar(unsigned char loc, unsigned char *p)
 }
 
 void CheckGuessed(){
+
 	letterFound = 0; //letter exists in word
 	unsigned char b = 0;
-	while((b < WTG_Index) || !letterFound){
+	while((b < WTG_Index) && !letterFound){
 		if(wordToGuess[b] == P2Guess){
 			displayGuess[b] = wordToGuess[b];
 			letterFound = 1;
@@ -55,7 +53,6 @@ void CheckGuessed(){
 	
 	if(letterFound == 0){
 		strike++;
-		PORTB = SetBit(PORTB,2,1);
 	}
 }
 
@@ -69,6 +66,8 @@ int LCD_Tick(int state){
 	{
 		case Init : state = WelcomeLCD;
 					LCD_ClearScreen();
+					PORTA = SetBit(PORTA,2,0);
+					PORTA = SetBit(PORTA,3,0);
 // 					//used to set image on nokia screen
 //  					lcd_setXY(0x40,0x80);
 //  					N5110_image(&head_body_arm_leg2);
@@ -106,8 +105,8 @@ int LCD_Tick(int state){
 							state = P1InputLCD;
 						}
 		break;
-		case P2InputLCD :	if(GetBit(~PINA, 6)){
-								
+		case P2InputLCD :	if(strike == 6){
+								state = LoseLCD;
 							}
 							else
 							{
@@ -116,7 +115,11 @@ int LCD_Tick(int state){
 		break;
 		case WinLCD:
 		break;
-		case LoseLCD :
+		case LoseLCD : if(GetBit(~PINA,7)){
+							state = Wait;
+						} else{
+							state = LoseLCD;
+						}
 		break;
 	}//end Transitions
 	
@@ -214,7 +217,7 @@ int LCD_Tick(int state){
 						LCD_Cursor(1);
 						LCD_WriteData(' ');
 						LCD_Cursor(1);
-						SetBit(PORTB,2,1);
+						
 						CheckGuessed();
 						for(unsigned char a = 0; a < WTG_Index; a++){
 							LCD_Cursor(a + 17);
@@ -233,7 +236,8 @@ int LCD_Tick(int state){
 		break;
 		case WinLCD:
 		break;
-		case LoseLCD :
+		case LoseLCD :	LCD_ClearScreen();
+						LCD_DisplayString(1, "YOU LOSE! YOU LOSE! YOU LOSE!");
 		break;
 	}//end Initializations
 	

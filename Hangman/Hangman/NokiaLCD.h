@@ -143,6 +143,9 @@ int Nokia_Tick(int state){
 		break;
 		case Strike1 :	if(strike == 2){
 							state = Strike2;
+							N5110_clear();
+							lcd_setXY(0x40,0x80);
+							N5110_image(&head_body);
 						} else{
 							state = Strike1;
 						}
@@ -195,7 +198,7 @@ int Nokia_Tick(int state){
 		break;
 		case Nokia_Wait : 
 		break;
-		case Strike1 :	N5110_clear();
+		case Strike1 :	//N5110_clear();
 		break;
 		case Strike2 :  
 		break;
