@@ -5,6 +5,8 @@
 
 unsigned char letterFound = 0; //checks is the letter P2 guess was in P1s word
 unsigned char WA_Count = 0;
+unsigned char WAReset = 0;
+unsigned char wrong = 0;
 
 unsigned char SetBit( unsigned char x, unsigned char k, unsigned char b) {
 	return (b ? x | (0x01 << k) : x & ~(0x01 << k));
@@ -50,12 +52,14 @@ void PWM_off() {
 	TCCR0B = 0x00;
 }
 
-enum WA_States {WA_Wait, SoundBuzzer, Wait_Low};
+enum WA_States {WA_Wait, SoundBuzzer, Wait_Low, WA_Reset};
 
 int WA_Tick(int state){
 	switch(state){
-		case WA_Wait :	if(letterFound){
-			PORTA = SetBit(PORTA,2,1);
+		case WA_Wait :	if(WAReset){
+							state = WA_Reset;
+						} else if(wrong){
+							PORTA = SetBit(PORTA,2,1);
 							state = SoundBuzzer;
 						}
 						else{
@@ -63,23 +67,28 @@ int WA_Tick(int state){
 						}
 						
 		break;
-		case SoundBuzzer :	
-							if(WA_Count <= 30){
+		case SoundBuzzer :	if(WAReset){
+								state = WA_Reset;
+							} else if(WA_Count <= 30){
 								state = SoundBuzzer;
 							}
 							else if(WA_Count > 30){
 								state = Wait_Low;
 								WA_Count = 0;
+								wrong = 0;
 							}
-							state = WA_Wait;
+							
 		break;
-		case Wait_Low : if(letterFound){
+		case Wait_Low : if(WAReset){
+							state = WA_Reset;
+						} else if(letterFound){
 							state = Wait_Low;
 						}
 						else{
 							state = WA_Wait;
 						}
 		break;
+		case WA_Reset : state = WA_Wait;
 		default: 
 		break;
 	}
@@ -90,10 +99,15 @@ int WA_Tick(int state){
 		break;
 		case SoundBuzzer : set_PWM(523.25);
 							WA_Count++;
-						PORTA = SetBit(PORTA,2,1);
+							PORTA = SetBit(PORTA,2,1);
 		break;
 		case Wait_Low : set_PWM(0);
-		PORTA = SetBit(PORTA,2,0);
+						PORTA = SetBit(PORTA,2,0);
+		break;
+		case WA_Reset : letterFound = 0; //checks is the letter P2 guess was in P1s word
+						WA_Count = 0;
+						WAReset = 0;
+						wrong = 0;
 		break;
 		default:
 		break;

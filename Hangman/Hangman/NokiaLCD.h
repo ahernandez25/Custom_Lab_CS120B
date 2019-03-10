@@ -118,10 +118,11 @@ void N5110_Custom_Data(const unsigned char *data)
 }
 
 enum NokiaStates {Nokia_Init, Nokia_Wait, Strike1, Strike2, Strike3, Strike4, Strike5, Nokia_Lose, 
-	Nokia_Win};
+	Nokia_Win, Nokia_Reset};
 
 unsigned char strike = 0;
 unsigned char counter = 0;
+unsigned char NOKIAReset = 0;
 	
 int Nokia_Tick(int state){
 	switch (state)
@@ -133,7 +134,12 @@ int Nokia_Tick(int state){
 							N5110_image(&logo);
 							state = Nokia_Wait;
 		break;
-		case Nokia_Wait : if(strike == 1){
+		case Nokia_Wait :	if(NOKIAReset){
+								state = NOKIAReset;
+								strike = 0;
+								counter = 0;
+								NOKIAReset = 0;
+							}else if(strike == 1){
 							 state = Strike1;
 							 N5110_clear();
 							 lcd_setXY(0x40,0x80);
@@ -142,7 +148,12 @@ int Nokia_Tick(int state){
 							  state = Nokia_Wait;
 						  } 
 		break;
-		case Strike1 :	if(strike == 2){
+		case Strike1 :	if(NOKIAReset){
+							state = NOKIAReset;
+							strike = 0;
+							counter = 0;
+							NOKIAReset = 0;
+						}else if(strike == 2){
 							state = Strike2;
 							N5110_clear();
 							lcd_setXY(0x40,0x80);
@@ -151,7 +162,12 @@ int Nokia_Tick(int state){
 							state = Strike1;
 						}
 		break;
-		case Strike2 :  if(strike == 3){
+		case Strike2 :  if(NOKIAReset){
+							state = NOKIAReset;
+							strike = 0;
+							counter = 0;
+							NOKIAReset = 0;
+						}else if(strike == 3){
 							state = Strike3;
 							N5110_clear();
 							lcd_setXY(0x40,0x80);
@@ -160,7 +176,12 @@ int Nokia_Tick(int state){
 							state = Strike2;
 						}
 		break;
-		case Strike3 :	if(strike == 4){
+		case Strike3 :	if(NOKIAReset){
+							state = NOKIAReset;
+							strike = 0;
+							counter = 0;
+							NOKIAReset = 0;
+						}else if(strike == 4){
 							state = Strike4;
 							N5110_clear();
 							lcd_setXY(0x40,0x80);
@@ -169,7 +190,12 @@ int Nokia_Tick(int state){
 							state = Strike3;
 						}
 		break;
-		case Strike4 : if(strike == 5){
+		case Strike4 :  if(NOKIAReset){
+							state = NOKIAReset;
+							strike = 0;
+							counter = 0;
+							NOKIAReset = 0;
+						}else if(strike == 5){
 							state = Strike5;
 							N5110_clear();
 							lcd_setXY(0x40,0x80);
@@ -178,7 +204,12 @@ int Nokia_Tick(int state){
 							state = Strike4;
 						}	
 		break;
-		case Strike5 :  if(strike == 6){
+		case Strike5 :  if(NOKIAReset){
+							state = NOKIAReset;
+							strike = 0;
+							counter = 0;
+							NOKIAReset = 0;
+						}else if(strike == 6){
 							state = Nokia_Lose;
 							N5110_clear();
 		 					lcd_setXY(0x40,0x80);
@@ -187,14 +218,31 @@ int Nokia_Tick(int state){
 							state = Strike5;
 						}
 		break;
-		case Nokia_Lose :	if(counter <= 20){
+		case Nokia_Lose :	if(NOKIAReset){
+								state = NOKIAReset;
+								strike = 0;
+								counter = 0;
+								NOKIAReset = 0;
+							}else if(counter <= 20){
 								state = Nokia_Lose;
 							}else if(counter > 20)
 							{
 								state = Nokia_Wait;
 							}
 		break;
-		case Nokia_Win : state = Nokia_Win;
+		case Nokia_Win : if(NOKIAReset){
+							state = NOKIAReset;
+							strike = 0;
+							counter = 0;
+							NOKIAReset = 0;
+						}else if(counter <= 20){
+							state = Nokia_Win;
+						}else if(counter > 20)
+						{
+							state = Nokia_Wait;
+						}
+		break;
+		case Nokia_Reset : state = Nokia_Init;
 		break;
 	}//end transitions
 	
@@ -225,6 +273,8 @@ int Nokia_Tick(int state){
 							counter++;
 		break;
 		case Nokia_Win :
+		break;
+		case Nokia_Reset :	
 		break;
 	}
 	
