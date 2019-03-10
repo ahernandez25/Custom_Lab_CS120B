@@ -10,7 +10,7 @@ unsigned char wordLength = 0;
 
 int SizeOfWord(){
 	int length = 0;
-	unsigned char* length1;
+	//unsigned char* length1;
 	unsigned char found = 0;
 	
 	while(!found && (index < 17)){

@@ -97,8 +97,8 @@ void N5110_Custom_Data(const unsigned char *data)
 	PORTB |= (1<<DC);									/* make DC pin to logic high for data operation */
 	SPI_SS_Enable();		
 								/* enable SS pin to slave selection */
-	unsigned char yPos = 0x40;
-	unsigned char xPos = 0x80;
+	//nsigned char yPos = 0x40;
+	//unsigned char xPos = 0x80;
 	//lcd_setXY(yPos, 0x80);
 	for (int g = 0; g < 504; g++)
 	{

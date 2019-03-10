@@ -100,7 +100,7 @@ int LCD_Tick(int state){
 						WTG_Index = 0; //world to guess index
 						lastClicked = ' ';  //last letter user clicked
 						P2Guess = ' ';
-						for(unsigned char k; k < 17; k++){
+						for(unsigned char k = 0; k < 17; k++){
 							displayGuess[k] = '_';
 							wordToGuess[k] = ' ';
 						}
@@ -146,19 +146,28 @@ int LCD_Tick(int state){
 		break;
 		case P2InputLCD :	if(strike == 6){
 								state = LoseLCD;
+								count = 0;
 							} else if(win){
 								state = WinLCD;
+								count = 0;
 							}
 							else
 							{
 								state = P2InputLCD;
 							}
 		break;
-		case WinLCD:
+		case WinLCD:	if(count <= 20){
+							state = WinLCD;
+						}else if(count > 20){
+							state = Wait;
+							LCD_ClearScreen();
+							LCD_DisplayString(1, "Press RESET to start a new game");
+						}
+						
 		break;
-		case LoseLCD :	if(counter <= 20){
+		case LoseLCD :	if(count <= 20){
 							state = LoseLCD;
-						}else if(counter > 20)
+						}else if(count > 20)
 						{
 							state = Wait;
 							LCD_ClearScreen();
@@ -252,6 +261,7 @@ int LCD_Tick(int state){
 						LCD_Cursor(1);
 						
 						CheckGuessed();
+						CheckCorrect();
 						for(unsigned char a = 0; a < WTG_Index; a++){
 							LCD_Cursor(a + 17);
 							LCD_WriteData(displayGuess[a]);
@@ -267,14 +277,19 @@ int LCD_Tick(int state){
 				
 							
 		break;
-		case WinLCD:
+		case WinLCD:	if(count % 4 == 0){
+							LCD_ClearScreen();
+						}else {
+							LCD_DisplayString(1, "YOU WIN! YOU WIN! YOU WIN!");
+						}
+						count++;
 		break;
-		case LoseLCD :	if(count & 2 == 0){
+		case LoseLCD :	if(count % 2 == 0){
 							LCD_ClearScreen();
 						}else {
 							LCD_DisplayString(1, "YOU LOSE! YOU LOSE! YOU LOSE!");
 						}
-						
+						count++;
 						
 		break;
 	}//end Initializations
