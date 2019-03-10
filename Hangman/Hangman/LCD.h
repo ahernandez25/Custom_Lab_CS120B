@@ -26,6 +26,8 @@ unsigned char P2Guess; //holds letter player 2 guessed
 unsigned char WTG_Index = 0; //world to guess index
 unsigned char lastClicked;  //last letter user clicked
 
+unsigned char win = 0;
+
 
 
 void LCDBuildChar(unsigned char loc, unsigned char *p)
@@ -56,6 +58,22 @@ void CheckGuessed(){
 	}
 }
 
+void CheckCorrect(){
+	unsigned char checkWin = 1;
+	win = 0;
+	unsigned char b = 0;
+	while((b < WTG_Index) && !checkWin){
+		if(wordToGuess[b] == '_'){
+			checkWin = 0;
+		}
+		b++;
+	}//end while
+	
+	if(checkWin){
+		win = 1;
+	}
+}
+
 
 enum LCD_States{Init, Wait, WelcomeLCD, P1InputLCD, P2InputLCD, WinLCD, LoseLCD};
 unsigned char count = 0; //counts how long display message is being displayed
@@ -74,7 +92,28 @@ int LCD_Tick(int state){
 					
 					
 		break;
-		case Wait : 
+		case Wait : if(GetBit(~PINA,7)){
+						state = WelcomeLCD;
+						count = 0;
+						LCD_ClearScreen();
+						LCDindex = 0;
+						WTG_Index = 0; //world to guess index
+						lastClicked = ' ';  //last letter user clicked
+						P2Guess = ' ';
+						for(unsigned char k; k < 17; k++){
+							displayGuess[k] = '_';
+							wordToGuess[k] = ' ';
+						}
+						letterFound = 0; //checks is the letter P2 guess was in P1s word
+						WA_Count = 0;
+						index = 1;
+						click = 0;
+						strike = 0;
+						counter = 0;
+						win = 0;
+					}else{
+						state = Wait;
+					}
 		break;
 		case WelcomeLCD : if(count <= 51){ 
 							  state = WelcomeLCD;
@@ -107,6 +146,8 @@ int LCD_Tick(int state){
 		break;
 		case P2InputLCD :	if(strike == 6){
 								state = LoseLCD;
+							} else if(win){
+								state = WinLCD;
 							}
 							else
 							{
@@ -115,10 +156,13 @@ int LCD_Tick(int state){
 		break;
 		case WinLCD:
 		break;
-		case LoseLCD : if(GetBit(~PINA,7)){
-							state = Wait;
-						} else{
+		case LoseLCD :	if(counter <= 20){
 							state = LoseLCD;
+						}else if(counter > 20)
+						{
+							state = Wait;
+							LCD_ClearScreen();
+							LCD_DisplayString(1, "Press RESET to start a new game");
 						}
 		break;
 	}//end Transitions
@@ -127,7 +171,7 @@ int LCD_Tick(int state){
 	{
 		case Init : 
 		break;
-		case Wait :
+		case Wait :												 
 		break;
 		case WelcomeLCD : 		/* LCD_DisplayString(1,welcomeMessage);
 								front = welcomeMessage[0];
@@ -198,17 +242,6 @@ int LCD_Tick(int state){
 		
 		break;
  		case P2InputLCD : 
-// 		for(unsigned char l = 0; l < WTG_Index; l++){
-// 			LCD_Cursor(l + 1);
-// 			LCD_WriteData(wordToGuess[l]);
-// 		}
-// 		LCD_Cursor(17);
-// 		LCD_WriteData('*');
-// 		SPI_Init();
-// 		N5110_init();
-// 				N5110_clear();
-// 				lcd_setXY(0x40,0x80);
-// 				N5110_Data("ElectronicWings");
 
 				if(GetBit(~PINA,5)){
 						P2Guess = lastClicked;
@@ -236,8 +269,13 @@ int LCD_Tick(int state){
 		break;
 		case WinLCD:
 		break;
-		case LoseLCD :	LCD_ClearScreen();
-						LCD_DisplayString(1, "YOU LOSE! YOU LOSE! YOU LOSE!");
+		case LoseLCD :	if(count & 2 == 0){
+							LCD_ClearScreen();
+						}else {
+							LCD_DisplayString(1, "YOU LOSE! YOU LOSE! YOU LOSE!");
+						}
+						
+						
 		break;
 	}//end Initializations
 	

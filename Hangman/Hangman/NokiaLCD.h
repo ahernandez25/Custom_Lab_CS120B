@@ -121,6 +121,7 @@ enum NokiaStates {Nokia_Init, Nokia_Wait, Strike1, Strike2, Strike3, Strike4, St
 	Nokia_Win};
 
 unsigned char strike = 0;
+unsigned char counter = 0;
 	
 int Nokia_Tick(int state){
 	switch (state)
@@ -186,9 +187,14 @@ int Nokia_Tick(int state){
 							state = Strike5;
 						}
 		break;
-		case Nokia_Lose :
+		case Nokia_Lose :	if(counter <= 20){
+								state = Nokia_Lose;
+							}else if(counter > 20)
+							{
+								state = Nokia_Wait;
+							}
 		break;
-		case Nokia_Win :
+		case Nokia_Win : state = Nokia_Win;
 		break;
 	}//end transitions
 	
@@ -198,7 +204,7 @@ int Nokia_Tick(int state){
 		break;
 		case Nokia_Wait : 
 		break;
-		case Strike1 :	//N5110_clear();
+		case Strike1 :	
 		break;
 		case Strike2 :  
 		break;
@@ -208,7 +214,15 @@ int Nokia_Tick(int state){
 		break;
 		case Strike5 : 
 		break;
-		case Nokia_Lose :
+		case Nokia_Lose :	if(counter % 2 == 0){
+								N5110_clear();
+							}
+							else
+							{
+								lcd_setXY(0x40, 0x80);
+								N5110_image(head_body_arm_leg2);
+							}
+							counter++;
 		break;
 		case Nokia_Win :
 		break;
