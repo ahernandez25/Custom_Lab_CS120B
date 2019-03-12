@@ -3,8 +3,8 @@
 #define LCD_H_
 #include "Keypad.h"
 #include "NokiaLCD.h"
+#include "LowestTime.h"
 
-#include "WordOperations.h"
 #include "WrongAnswer.h"
 
 
@@ -80,7 +80,7 @@ void CheckCorrect(){
 enum LCD_States{Init, Wait, MenuLCD, WelcomeLCD, P1InputLCD, P2InputLCD, WinLCD, LoseLCD, 
 	ResetLCD};
 unsigned char count = 0; //counts how long display message is being displayed
-unsigned char highScore;
+
 
 int LCD_Tick(int state){
 	switch (state)
@@ -91,28 +91,26 @@ int LCD_Tick(int state){
 					PORTA = SetBit(PORTA,3,0);
 					LCD_DisplayString(1, "High Score ");
 					LCD_Cursor(12);
-					//EEPROM_Write(0,0x01);
-					
-					//highScore = EEPROM_read(0x00);
-					
-// 					if( highScore > 0){
-// 						LCD_WriteData(highScore + '0');
-// 						LCD_WriteData('s');
-// 						
-// 					}else {
-// 						LCD_WriteData(0 + '0');
-// 						LCD_WriteData('s');					
-// 					}
 
-					//sets each place in score
-					ReturnHighScore(0xfa);
+
+					ReturnHighScore(eeprom_read_word(( short*)46 ));
 					
-					//writes score to lcd screen
-					LCD_WriteData((thousands) + '0');
-					LCD_WriteData(hundreds + '0');
-					LCD_WriteData(tens + '0');
-					LCD_WriteData(ones + '0');
-					LCD_WriteData('s');
+					if(EEPROM_read(eeprom_read_word(( short*)46 )) > 0){
+						
+						LCD_WriteData((thousands) + '0');
+						LCD_WriteData(hundreds + '0');
+						LCD_WriteData(tens + '0');
+						LCD_WriteData(ones + '0');
+						LCD_WriteData('s');
+					}else {
+						//writes score to lcd screen
+						LCD_WriteData(0 + '0');
+						LCD_WriteData(0 + '0');
+						LCD_WriteData(0 + '0');
+						LCD_WriteData(0 + '0');
+						LCD_WriteData('s');	
+					}
+					
 
 					for(unsigned char a = 0; a < 11; a++){
 						LCD_Cursor(a + 17);
@@ -161,7 +159,10 @@ int LCD_Tick(int state){
 								}
 								
 								LCD_Cursor(1);
-								LCDindex = 1;					
+								LCDindex = 1;	
+								
+								//starts timer
+								startTimer = 1;				
 						}else{						
 							state = P1InputLCD;
 						}
@@ -172,9 +173,11 @@ int LCD_Tick(int state){
 							}else if(strike == 6){
 								state = LoseLCD;
 								count = 0;
+								startTimer = 0;
 							} else if(win){
 								state = WinLCD;
 								count = 0;
+								stopTimer = 1;
 							}
 							else
 							{
@@ -317,6 +320,7 @@ int LCD_Tick(int state){
 		case ResetLCD :	state = WelcomeLCD;
 						count = 0;
 						LCD_ClearScreen();
+						N5110_clear();
 						LCDindex = 1;
 						WTG_Index = 0; //world to guess index
 						lastClicked = ' ';  //last letter user clicked

@@ -136,6 +136,9 @@
     <Compile Include="LCDImages.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="LowestTime.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.c">
       <SubType>compile</SubType>
     </Compile>

@@ -3,6 +3,8 @@
 #ifndef WORDOPERATIONS_H_
 #define WORDOPERATIONS_H_
 
+#include <avr/eeprom.h>
+
 unsigned char wordToGuess[17] = {' '};
 unsigned char ScoreArray[4] = {0};
 	unsigned char hundreds;
@@ -59,7 +61,7 @@ unsigned char EEPROM_read(unsigned int uiAddress)
 	return EEDR;
 }
 
-void ReturnHighScore(unsigned char newScore){
+void ReturnHighScore(unsigned short newScore){
 	thousands = newScore / 1000;
 	hundreds = (newScore % 1000) / 100;
 	 tens = (newScore % 100) / 10;
