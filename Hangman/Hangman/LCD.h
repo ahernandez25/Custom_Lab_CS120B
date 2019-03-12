@@ -14,11 +14,12 @@
  * A7 - Reset 
  ************************/
 
-unsigned char welcomeMessage[67] = "Let's play Hangman! Player 1, enter a word for Player 2 to guess.";
+
 unsigned char front;
 unsigned char LCDindex = 0;
 unsigned char customChar[8] = {0x0E, 0x0A, 0x0E, 0x04, 0x0E, 0x04, 0x04, 0x0A}; //hangman charactr
-
+unsigned char welcomeMessage[67] = "Let's play Hangman! Player 1, enter a word for Player 2 to guess.";
+unsigned char pressEnter[11] = {"Press Enter"};
 
 unsigned char displayGuess[17] = {'_'}; //shows player 2 correct guesses
 unsigned char P2Guess; //holds letter player 2 guessed
@@ -76,21 +77,47 @@ void CheckCorrect(){
 }
 
 
-enum LCD_States{Init, Wait, WelcomeLCD, P1InputLCD, P2InputLCD, WinLCD, LoseLCD, 
+enum LCD_States{Init, Wait, MenuLCD, WelcomeLCD, P1InputLCD, P2InputLCD, WinLCD, LoseLCD, 
 	ResetLCD};
 unsigned char count = 0; //counts how long display message is being displayed
-
+unsigned char highScore;
 
 int LCD_Tick(int state){
 	switch (state)
 	{
-		case Init : state = WelcomeLCD;
+		case Init : state = MenuLCD;
 					LCD_ClearScreen();
 					PORTA = SetBit(PORTA,2,0);
 					PORTA = SetBit(PORTA,3,0);
-// 					//used to set image on nokia screen
-//  					lcd_setXY(0x40,0x80);
-//  					N5110_image(&head_body_arm_leg2);
+					LCD_DisplayString(1, "High Score ");
+					LCD_Cursor(12);
+					//EEPROM_Write(0,0x01);
+					
+					//highScore = EEPROM_read(0x00);
+					
+// 					if( highScore > 0){
+// 						LCD_WriteData(highScore + '0');
+// 						LCD_WriteData('s');
+// 						
+// 					}else {
+// 						LCD_WriteData(0 + '0');
+// 						LCD_WriteData('s');					
+// 					}
+
+					//sets each place in score
+					ReturnHighScore(0xfa);
+					
+					//writes score to lcd screen
+					LCD_WriteData((thousands) + '0');
+					LCD_WriteData(hundreds + '0');
+					LCD_WriteData(tens + '0');
+					LCD_WriteData(ones + '0');
+					LCD_WriteData('s');
+
+					for(unsigned char a = 0; a < 11; a++){
+						LCD_Cursor(a + 17);
+						LCD_WriteData(pressEnter[a]);
+					}
 					
 					
 		break;
@@ -99,6 +126,13 @@ int LCD_Tick(int state){
 					}else{
 						state = Wait;
 					}
+		break;
+		case MenuLCD : if(GetBit(~PINA,6)){
+							state = WelcomeLCD;
+							LCD_ClearScreen();
+						}else {
+							state = MenuLCD;
+						}
 		break;
 		case WelcomeLCD :	if(GetBit(~PINA,7)){
 								state = ResetLCD;
@@ -178,6 +212,8 @@ int LCD_Tick(int state){
 		case Init : 
 		break;
 		case Wait :												 
+		break;
+		case MenuLCD :
 		break;
 		case WelcomeLCD : 		/* LCD_DisplayString(1,welcomeMessage);
 								front = welcomeMessage[0];
@@ -300,6 +336,7 @@ int LCD_Tick(int state){
 						WAReset = 1;
 						PORTA = SetBit(PORTA,2,0);
 						PORTA = SetBit(PORTA,3,0);
+						ResetWelcomeMessage(&welcomeMessage);
 		break;
 	}//end Initializations
 	
