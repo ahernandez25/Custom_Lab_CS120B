@@ -46,7 +46,7 @@ void CheckGuessed(){
 
 	letterFound = 0; //letter exists in word
 	unsigned char b = 0;
-	while((b < WTG_Index) && !letterFound){
+	while((b < WTG_Index)){
 		if(wordToGuess[b] == P2Guess){
 			displayGuess[b] = wordToGuess[b];
 			letterFound = 1;
@@ -128,6 +128,22 @@ int LCD_Tick(int state){
 		case MenuLCD : if(GetBit(~PINA,6)){
 							state = WelcomeLCD;
 							LCD_ClearScreen();
+							delay_ms(2);
+ 							LCDBuildChar(0, customChar);
+							LCD_Cursor(17);
+							LCD_WriteData(0x00);
+							LCD_Cursor(20);
+							LCD_WriteData(0x00);
+							LCD_Cursor(23);
+							LCD_WriteData(0x00);
+							LCD_Cursor(26);
+							LCD_WriteData(0x00);
+							LCD_Cursor(29);
+							LCD_WriteData(0x00);
+							LCD_Cursor(32);
+							LCD_WriteData(0x00);
+							LCD_Cursor(35);
+							LCD_WriteData(0x00);
 						}else {
 							state = MenuLCD;
 						}
@@ -193,7 +209,6 @@ int LCD_Tick(int state){
 							LCD_ClearScreen();
 							LCD_DisplayString(1, "Press RESET to start a new game");
 						}
-						
 		break;
 		case LoseLCD :	if(GetBit(~PINA,7)){
 							state = ResetLCD;
@@ -218,17 +233,7 @@ int LCD_Tick(int state){
 		break;
 		case MenuLCD :
 		break;
-		case WelcomeLCD : 		/* LCD_DisplayString(1,welcomeMessage);
-								front = welcomeMessage[0];
-		
-								for (unsigned char j = 0; j < 67; j++) {
-									welcomeMessage[j] = welcomeMessage[j + 1];
-								}
-								// put the saved character on the end
-								welcomeMessage[67] = front; */
-		
-						
-							for(LCDindex = 0; LCDindex < 16; LCDindex++){
+		case WelcomeLCD : 	for(LCDindex = 0; LCDindex < 16; LCDindex++){
 								LCD_Cursor(LCDindex + 1);
 								LCD_WriteData(welcomeMessage[LCDindex]);
 							}
@@ -241,36 +246,22 @@ int LCD_Tick(int state){
 							// put the saved character on the end
 							welcomeMessage[67] = front;
 		
-							LCDBuildChar(0, customChar);
-								LCD_Cursor(17);
-								LCD_WriteData(0x00);
-								LCD_Cursor(20);
-								LCD_WriteData(0x00);
-								LCD_Cursor(23);
-								LCD_WriteData(0x00);
-								LCD_Cursor(26);
-								LCD_WriteData(0x00);
-								LCD_Cursor(29);
-								LCD_WriteData(0x00);
-								LCD_Cursor(32);
-								LCD_WriteData(0x00);
-								LCD_Cursor(35);
-								LCD_WriteData(0x00);
-		
 							count++;
-		
-			
+							lastClicked = ' ';
 		break;
 		case P1InputLCD :	if(GetBit(~PINA,5)){
-								if(WTG_Index < 16){
-									LCDindex++;
-									wordToGuess[WTG_Index] = lastClicked;
-									WTG_Index++;
-									character = ' ';
-									click = 0;
-					
-								}
-							}
+								if(lastClicked != ' '){
+									if(WTG_Index < 16){
+										LCDindex++;
+										wordToGuess[WTG_Index] = lastClicked;
+										WTG_Index++;
+										lastClicked = ' ';
+										character = ' ';
+											click = 0;					
+									}//end WTG_index < 16
+								}//end lastClicked != ' '
+							}//end getBit()
+							
 							LCD_Cursor(LCDindex);
 							if(character != ' '){
 								lastClicked = character;
@@ -279,28 +270,29 @@ int LCD_Tick(int state){
 			
 		break;
  		case P2InputLCD :	if(GetBit(~PINA,5)){
+								if(lastClicked != ' '){
 									P2Guess = lastClicked;
+									lastClicked = ' ';
 									character = ' ';
 									click = 0;
 									LCD_Cursor(1);
 									LCD_WriteData(' ');
 									LCD_Cursor(1);
-						
+										
 									CheckGuessed();
 									CheckCorrect();
 									for(unsigned char a = 0; a < WTG_Index; a++){
 										LCD_Cursor(a + 17);
 										LCD_WriteData(displayGuess[a]);
-									}
-					
-							}
+									}//end for loop								
+								}//end lastClicked != ' '
+							}//end getbit()
+							
 							LCD_Cursor(1);
 							if(character != ' '){
 								lastClicked = character;
 								LCD_WriteData(character);
-							}
-				
-							
+							}	
 		break;
 		case WinLCD:	if(count % 2 == 0){
 							LCD_ClearScreen();
@@ -341,6 +333,22 @@ int LCD_Tick(int state){
 						PORTA = SetBit(PORTA,2,0);
 						PORTA = SetBit(PORTA,3,0);
 						ResetWelcomeMessage(&welcomeMessage);
+						delay_ms(2);
+						LCDBuildChar(0, customChar);
+						LCD_Cursor(17);
+						LCD_WriteData(0x00);
+						LCD_Cursor(20);
+						LCD_WriteData(0x00);
+						LCD_Cursor(23);
+						LCD_WriteData(0x00);
+						LCD_Cursor(26);
+						LCD_WriteData(0x00);
+						LCD_Cursor(29);
+						LCD_WriteData(0x00);
+						LCD_Cursor(32);
+						LCD_WriteData(0x00);
+						LCD_Cursor(35);
+						LCD_WriteData(0x00);
 		break;
 	}//end Initializations
 	
