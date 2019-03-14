@@ -164,21 +164,26 @@ int LCD_Tick(int state){
 		case P1InputLCD :	if(GetBit(~PINA,7)){
 								state = ResetLCD;
 							}else if(GetBit(~PINA, 6)){
-								LCD_ClearScreen();
-								state = P2InputLCD;
-								delay_ms(2);
+								if(wordToGuess[0] != ' '){
+									LCD_ClearScreen();
+									state = P2InputLCD;
+									delay_ms(2);
 							
-								for(unsigned char a = 0; a < WTG_Index; a++){
-									displayGuess[a] = '_';
-									LCD_Cursor(a + 17);
-									LCD_WriteData('_');
-								}
+									for(unsigned char a = 0; a < WTG_Index; a++){
+										displayGuess[a] = '_';
+										LCD_Cursor(a + 17);
+										LCD_WriteData('_');
+									}
 								
-								LCD_Cursor(1);
-								LCDindex = 1;	
+									LCD_Cursor(1);
+									LCDindex = 1;	
 								
-								//starts timer
-								startTimer = 1;				
+									//starts timer
+									startTimer = 1;	
+								}else{ 
+									state = P1InputLCD; 
+								}//end if(wordToGuess[0] != ' '
+											
 						}else{						
 							state = P1InputLCD;
 						}
@@ -207,7 +212,7 @@ int LCD_Tick(int state){
 						}else if(count > 20){
 							state = Wait;
 							LCD_ClearScreen();
-							LCD_DisplayString(1, "Press RESET to start a new game");
+							LCD_DisplayString(1, "Press RESET to  start a new game");
 						}
 		break;
 		case LoseLCD :	if(GetBit(~PINA,7)){
@@ -218,7 +223,7 @@ int LCD_Tick(int state){
 						{
 							state = Wait;
 							LCD_ClearScreen();
-							LCD_DisplayString(1, "Press RESET to start a new game");
+							LCD_DisplayString(1, "Press RESET to  start a new game");
 						}
 		break;
 		case ResetLCD : state = WelcomeLCD;
