@@ -1,24 +1,22 @@
-/*
- * Hangman.c
- *
- * Created: 2/19/2019 3:06:42 PM
- * Author : ashly
- */ 
+/*  Name & E-mail: Ashly Hernandez ahern122@ucr.edu
+ *	------------------------------------------------
+ *  Contains the main function that runs the while loop which checks all 
+ *  tasks. 
+ */
+ 
 
 #include <avr/io.h>
 #include "LCD.h"
 
 
 typedef struct task {
-	/*Tasks should have members that include: state, period,
-	a measurement of elapsed time, and a function pointer.*/
-	signed char state; //Task's current state
-	unsigned long int period; //Task period
-	unsigned long int elapsedTime; //Time elapsed since last task tick
-	int (*TickFct)( int ); //Task tick function
+	signed char state;				//Task's current state
+	unsigned long int period;		//Task period
+	unsigned long int elapsedTime;	//Time elapsed since last task tick
+	int (*TickFct)( int );			//Task tick function
 } task;
 
-	static task Tasks[5];
+static task Tasks[5];	//Struct off all tasks
 
 int main(void)
 {
@@ -27,50 +25,56 @@ int main(void)
 	DDRB = 0xFF; PORTB = 0x00; // PORTB set to output, outputs init 0s
 	DDRC = 0xF0; PORTC = 0x0F; // PC7..4 outputs init 0s, PC3..0 inputs init 1s
 	
-	unsigned long LCDPeriod = 500;
-	unsigned long KPPeriod = 300;
-	unsigned long WAPeriod = 100;
-	unsigned long NokiaPeriod = 500;
-	unsigned long LTPeriod = 500;
+	unsigned long LCDPeriod = 500;		//Period for LCD screen task
+	unsigned long KPPeriod = 300;		//Period for Keypad input task
+	unsigned long WAPeriod = 100;		//Period for Wrong answer task
+	unsigned long NokiaPeriod = 500;	//Period for Nokia screen task
+	unsigned long LTPeriod = 500;		//Period for Lowest time task
 	
-	unsigned long period = 100;
-	unsigned char i = 0;
+	unsigned long period = 100;		//Period for system
+	unsigned char i = 0;			//index to initialize task stucks
 	
+	//Initializes LCD screen task
 	Tasks[i].state = Init;
 	Tasks[i].period = LCDPeriod;
 	Tasks[i].elapsedTime = LCDPeriod;
 	Tasks[i].TickFct = &LCD_Tick;
 	i++;
+	
+	//Initializes Keypad task
 	Tasks[i].state = Wait_KP;
 	Tasks[i].period = KPPeriod;
 	Tasks[i].elapsedTime = KPPeriod;
 	Tasks[i].TickFct = &KeypadTick;
 	i++;
+	
+	//Initializes wrong answer task
 	Tasks[i].state = WA_Wait;
 	Tasks[i].period = WAPeriod;
 	Tasks[i].elapsedTime = WAPeriod;
 	Tasks[i].TickFct = &WA_Tick;
 	i++;
+	
+	//Initializes nokia screen task
 	Tasks[i].state = Nokia_Init;
 	Tasks[i].period = NokiaPeriod;
 	Tasks[i].elapsedTime = NokiaPeriod;
 	Tasks[i].TickFct = &Nokia_Tick;
 	i++;
+	
+	//Initializes lowest time task
 	Tasks[i].state = LT_Init;
 	Tasks[i].period = LTPeriod;
 	Tasks[i].elapsedTime = LTPeriod;
 	Tasks[i].TickFct = &LT_Tick;
 	
-	//LCDBuildChar(0, customChar);
-	TimerSet(period);
-	TimerOn();
-	LCD_init();
-	PWM_on();
 
-	
-	
-	//LCD_DisplayString(1,"Please Work");
-	
+	TimerSet(period);	//sets timer to designated period
+	TimerOn();			//turns on timer
+	LCD_init();			//initializes lcd screen
+	PWM_on();			//initializes buzzer
+
+	//infinite while loop that runs and implements all tasls	
 	while (1) {
 		for ( i = 0; i < 5; i++ ) {
 			// Task is ready to tick

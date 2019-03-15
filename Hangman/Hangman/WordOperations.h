@@ -1,18 +1,20 @@
-
+/*  Name & E-mail: Ashly Hernandez ahern122@ucr.edu
+ *	------------------------------------------------
+ *  Contains the functions to reset the welcome message and 
+ * correctly display the score on the screen. 
+ */
 
 #ifndef WORDOPERATIONS_H_
 #define WORDOPERATIONS_H_
 
 #include <avr/eeprom.h>
 
-unsigned char wordToGuess[17] = {' '};
-unsigned char ScoreArray[4] = {0};
-	unsigned char hundreds;
-	unsigned char thousands;
-	unsigned char tens;
-	unsigned char ones;
-
-
+unsigned char wordToGuess[17] = {' '}; //array for word to be guessed
+unsigned char ScoreArray[4] = {0};		
+unsigned char hundreds;		//hundres place of score
+unsigned char thousands;	//thousands place of score
+unsigned char tens;			//tens place of score
+unsigned char ones;			//ones place of score
 
 void ResetWelcomeMessage(unsigned char message[67]){
 	
@@ -34,40 +36,13 @@ void ResetWelcomeMessage(unsigned char message[67]){
 	}
 }
 
-void EEPROM_Write(unsigned int uiAddress, unsigned char ucData){
-	
-	/* Wait for completion of previous write */
-	while(EECR & (1<<EEPE))
-	;
-	/* Set up address and Data Registers */
-	EEAR = uiAddress;
-	EEDR = ucData;
-	/* Write logical one to EEMPE */
-	EECR |= (1<<EEMPE);
-	/* Start eeprom write by setting EEPE */
-	EECR |= (1<<EEPE);
-}
-
-unsigned char EEPROM_read(unsigned int uiAddress)
-{
-	/* Wait for completion of previous write */
-	while(EECR & (1<<EEPE))
-	;
-	/* Set up address register */
-	EEAR = uiAddress;
-	/* Start eeprom read by writing EERE */
-	EECR |= (1<<EERE);
-	/* Return data from Data Register */
-	return EEDR;
-}
-
+/* saves each place of the score in a different variable to be 
+ * correctly displayed on LCD screen */
 void ReturnHighScore(unsigned short newScore){
 	thousands = newScore / 1000;
 	hundreds = (newScore % 1000) / 100;
 	 tens = (newScore % 100) / 10;
 	ones = newScore % 10;
 }
-
-
 
 #endif /* WORDOPERATIONS_H_ */
